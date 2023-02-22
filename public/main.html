@@ -113,7 +113,7 @@
     const topicWord = document.createElement('a')
     topicWord.innerText = decodeURIComponent(topic)
     topicWord.setAttribute('href', `/#topic/${topic}`)
-    topicWord.setAttribute('data-word', topic)
+    topicWord.setAttribute('data-word', topic.toLowerCase())
     dictionary.appendChild(topicWord)
    }
   }
