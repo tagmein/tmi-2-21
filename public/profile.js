@@ -2,30 +2,35 @@ async function profile() {
  const profileElement = document.getElementById('profile')
  const key = localStorage.getItem('key')
  if (key) {
-  const profileResponse = await fetch('/profile.json', {
-   headers: { 'x-key': key }
-  })
-  window.myProfile = await profileResponse.json()
-  if (window.myProfile) {
-   Array.from(document.getElementsByClassName('key-input')).forEach(x => {
-    x.value = key
+  try {
+   const profileResponse = await fetch('/profile.json', {
+    headers: { 'x-key': key }
    })
-   const profileName = document.createElement('span')
-   profileName.innerText = myProfile.email
-   profileElement.appendChild(profileName)
-   document.body.classList.add('is-registered')
-   const profileLink = document.createElement('a')
-   profileLink.innerText = 'Profile'
-   profileLink.setAttribute('href', `/#profile`)
-   profileElement.appendChild(profileLink)
-   const signOutLink = document.createElement('a')
-   signOutLink.innerText = 'Sign out'
-   profileElement.appendChild(signOutLink)
-   signOutLink.addEventListener('click', function () {
-    localStorage.removeItem('key')
-    window.location.reload()
-   })
-   return
+   window.myProfile = await profileResponse.json()
+   if (window.myProfile) {
+    Array.from(document.getElementsByClassName('key-input')).forEach(x => {
+     x.value = key
+    })
+    const profileName = document.createElement('span')
+    profileName.innerText = myProfile.email
+    profileElement.appendChild(profileName)
+    document.body.classList.add('is-registered')
+    const profileLink = document.createElement('a')
+    profileLink.innerText = 'Profile'
+    profileLink.setAttribute('href', `/#profile`)
+    profileElement.appendChild(profileLink)
+    const signOutLink = document.createElement('a')
+    signOutLink.innerText = 'Sign out'
+    profileElement.appendChild(signOutLink)
+    signOutLink.addEventListener('click', function () {
+     localStorage.removeItem('key')
+     window.location.reload()
+    })
+    return
+   }
+  }
+  catch (e) {
+   console.error(e)
   }
   localStorage.removeItem('key')
  }
