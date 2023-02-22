@@ -1,0 +1,37 @@
+async function invitePage(pageElement, navigationDetail) {
+ const title = document.createElement('h3')
+ title.innerText = 'Invite'
+ pageElement.appendChild(title)
+ const instructions = document.createElement('p')
+ instructions.innerHTML = `No email will be sent. Enter an email address, and a password will be generated. Then, share the password with the person you are inviting. The new user can change their own password later.`
+ pageElement.appendChild(instructions)
+ const inviteCrumb = document.createElement('span')
+ inviteCrumb.innerText = 'Invite'
+ navigationDetail.appendChild(inviteCrumb)
+ const inviteForm = document.createElement('form')
+ inviteForm.setAttribute('action', '/profile/create')
+ inviteForm.setAttribute('method', 'post')
+ inviteForm.setAttribute('enctype', 'multipart/form-data')
+ const emailLabel = document.createElement('label')
+ const emailLabelText = document.createElement('div')
+ emailLabelText.innerText = 'Email address'
+ emailLabel.appendChild(emailLabelText)
+ inviteForm.appendChild(emailLabel)
+ const emailInput = document.createElement('input')
+ emailInput.setAttribute('type', 'text')
+ emailInput.setAttribute('maxlength', '100')
+ emailInput.setAttribute('name', 'email')
+ emailLabel.appendChild(emailInput)
+ const hiddenKeyInput = document.createElement('input')
+ hiddenKeyInput.setAttribute('type', 'hidden')
+ hiddenKeyInput.setAttribute('name', 'key')
+ hiddenKeyInput.value = localStorage.getItem('key')
+ inviteForm.appendChild(hiddenKeyInput)
+ const buttons = document.createElement('p')
+ const submit = document.createElement('input')
+ submit.setAttribute('value', 'Create account')
+ submit.setAttribute('type', 'submit')
+ buttons.appendChild(submit)
+ inviteForm.appendChild(buttons)
+ pageElement.appendChild(inviteForm)
+}

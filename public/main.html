@@ -1,0 +1,133 @@
+<!doctype html>
+
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title>Tag Me In</title>
+ <link href="/main.css" rel="stylesheet" type="text/css" />
+ <link id="favicon" rel="shortcut icon" type="image/png"
+  href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX///8AAABVwtN+AAAAK0lEQVQI12P4/5/h/0eG/79B6O9thj+zGf5IM/wNZGC9z3AXjO7/R6D//wGWfRuJudGK0QAAAABJRU5ErkJggg==" />
+ <script src="/profile.js"></script>
+ <script src="/profile.page.js"></script>
+ <script src="/invite.page.js"></script>
+ <script src="/topic.page.js"></script>
+</head>
+
+<body class="display main" tabindex="0">
+ <div id="navbar">
+  <div id="profile"></div>
+  <a href="/#">Tag Me In</a>
+  <span id="navigation-detail"></span>
+ </div>
+ <div id="content">
+  <div class="page" id="page-home" style="display: none;">
+   <h3>Topics</h3>
+   <p><input id="topic-filter" type="search" placeholder="filter" /></p>
+   <form id="new-topic-form" action="/topic/create" method="post" class="modal-form registered"
+    enctype="multipart/form-data">
+    <h3>Create new topic</h3>
+    <input class="key-input" type="hidden" name="key" />
+    <label>
+     <div>Topic</div>
+     <input id="new-topic-input" name="topic" type="text" placeholder="" />
+    </label>
+    <p><input type="submit" value="Create" /> <button id="new-topic-cancel">Cancel</button></p>
+   </form>
+   <div id="dictionary"></div>
+   <p class="registered"><button id="new-topic">New topic</button></p>
+  </div>
+ </div>
+ <script>
+  document.getElementById('new-topic').addEventListener('click', function () {
+   const form = document.getElementById('new-topic-form')
+   const isOpen = form.style.display === 'block'
+   form.style.display = isOpen ? '' : 'block'
+   if (!isOpen) {
+    document.getElementById('new-topic-input').focus()
+   }
+  })
+  document.getElementById('new-topic-cancel').addEventListener('click', function (e) {
+   e.preventDefault()
+   const form = document.getElementById('new-topic-form')
+   form.style.display = ''
+  })
+  const dictionary = document.getElementById('dictionary')
+  const topicFilter = document.getElementById('topic-filter')
+  const topicFilterStyle = document.createElement('style')
+  document.head.appendChild(topicFilterStyle)
+  function updateTopicFilter() {
+   if (topicFilter.value.length > 0) {
+    topicFilterStyle.innerHTML = `
+ #dictionary > a { display: none; }
+ #dictionary > a[data-word*=${JSON.stringify(topicFilter.value)}] { display: inline-block; }
+    `
+   }
+   else {
+    topicFilterStyle.innerHTML = ''
+   }
+  }
+  topicFilter.addEventListener('keyup', updateTopicFilter)
+  updateTopicFilter()
+
+  async function main() {
+   await profile()
+   home()
+
+   async function navigate() {
+    const { hash } = window.location
+    const [page, detail] = hash.substring(1).split('/').map(decodeURIComponent)
+    removeAllPages()
+    navigationDetail.innerHTML = ''
+    if (page === '') {
+     homePage.style.display = ''
+     return
+    }
+    homePage.style.display = 'none'
+    const pageElement = document.createElement('div')
+    pageElement.classList.add('page')
+    contentContainer.appendChild(pageElement)
+    switch (page) {
+     case 'topic':
+      topicPage(pageElement, navigationDetail, detail)
+      break
+     case 'invite':
+      invitePage(pageElement, navigationDetail, detail)
+      break
+     case 'profile':
+      profilePage(pageElement, navigationDetail, detail)
+      break
+    }
+   }
+
+   window.addEventListener('hashchange', navigate)
+   navigate()
+  }
+
+  async function home() {
+   const topicsResponse = await fetch('/topics')
+   const topics = (await topicsResponse.json())
+    .filter(x => x.type === 'directory' && !x.name.startsWith('.'))
+    .map(x => x.name)
+    .sort()
+   for (const topic of topics) {
+    const topicWord = document.createElement('a')
+    topicWord.innerText = decodeURIComponent(topic)
+    topicWord.setAttribute('href', `/#topic/${topic}`)
+    topicWord.setAttribute('data-word', topic)
+    dictionary.appendChild(topicWord)
+   }
+  }
+  main()
+
+  const contentContainer = document.getElementById('content')
+  const navigationDetail = document.getElementById('navigation-detail')
+  const homePage = document.getElementById('page-home')
+  function removeAllPages() {
+   for (const page of Array.from(document.getElementsByClassName('page'))) {
+    if (page !== homePage) {
+     page.parentElement.removeChild(page)
+    }
+   }
+  }
+ </script>
+</body>
