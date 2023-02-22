@@ -48,7 +48,6 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   case 'POST /signin':
    const email = requestBodyOther.email.trim().toLowerCase()
    const profileData = await data.read(`account:${email}`)
-
    if (profileData.password === requestBodyOther.password) {
     const newKey = randomCode(40)
     const timestamp = Date.now()
