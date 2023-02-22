@@ -48,15 +48,16 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
   case 'POST /signin':
    const email = requestBodyOther.email.trim().toLowerCase()
    const profileData = await data.read(`account:${email}`)
-   if (!('accountId' in profileData)) {
-    profileData.accountId = randomCode(40)
-    await data.write(`account:${email}`, profileData)
-    await data.write(`accountId:${profileData.accountId}`, { email })
-   }
+
    if (profileData.password === requestBodyOther.password) {
     const newKey = randomCode(40)
     const timestamp = Date.now()
     await data.write(`key:${newKey}`, { email, timestamp })
+    if (!('accountId' in profileData)) {
+     profileData.accountId = randomCode(40)
+     await data.write(`account:${email}`, profileData)
+     await data.write(`accountId:${profileData.accountId}`, { email })
+    }
     return html(`<script>
      localStorage.setItem('key', ${JSON.stringify(newKey)})
      location.replace(${JSON.stringify(requestBodyOther.redirect)})
