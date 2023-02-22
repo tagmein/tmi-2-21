@@ -1,3 +1,16 @@
+const sandbox = [
+ 'downloads', 'forms', 'scripts'
+].map(x => `allow-${x}`).join(' ')
+
+function attachFrameWithContent(attachTo, content) {
+ const newFrame = document.createElement('iframe')
+ newFrame.setAttribute('referrerpolicy', 'no-referrer')
+ newFrame.setAttribute('credentialless', true)
+ newFrame.setAttribute('sandbox', sandbox)
+ newFrame.setAttribute('srcdoc', content)
+ attachTo.appendChild(newFrame)
+}
+
 async function topicPage(pageElement, navigationDetail, topic) {
  const topicCrumb = document.createElement('span')
  topicCrumb.innerText = topic
@@ -81,16 +94,21 @@ async function topicPage(pageElement, navigationDetail, topic) {
   }
   postElement.appendChild(postAuthor)
   let isFirst = true
-  for (const paragraph of post.content.trim().split('\n')) {
-   if (isFirst) {
-    isFirst = false
-    if (paragraph.trim().length === 0) {
-     continue
+  if (post.content.startsWith('<!doctype html>')) {
+   attachFrameWithContent(postElement, post.content)
+  }
+  else {
+   for (const paragraph of post.content.trim().split('\n')) {
+    if (isFirst) {
+     isFirst = false
+     if (paragraph.trim().length === 0) {
+      continue
+     }
     }
+    const paragraphElement = document.createElement('p')
+    paragraphElement.innerText = paragraph
+    postElement.appendChild(paragraphElement)
    }
-   const paragraphElement = document.createElement('p')
-   paragraphElement.innerText = paragraph
-   postElement.appendChild(paragraphElement)
   }
   pageElement.appendChild(postElement)
  }

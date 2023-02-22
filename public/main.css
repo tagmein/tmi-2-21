@@ -271,3 +271,10 @@ form.modal-form:after {
 .post p:last-child {
  margin-bottom: 0;
 }
+
+.post iframe {
+ border: 1px solid #797979;
+ height: 600px;
+ max-height: calc(100vh - 200px);
+ width: 100%;
+}
