@@ -102,7 +102,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
     path.join(
      rootPath,
      'topics',
-     encodeURIComponent(requestBodyOther.topic)
+     encodeURIComponent(requestBodyOther.topic.trim().toLowerCase())
     )
    )
    return redirect('/')

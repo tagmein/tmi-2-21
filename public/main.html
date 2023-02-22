@@ -38,12 +38,16 @@
   </div>
  </div>
  <script>
+  const newTopicInput = document.getElementById('new-topic-input')
+  newTopicInput.addEventListener('keyup', function () {
+   newTopicInput.value = newTopicInput.value.toLowerCase()
+  })
   document.getElementById('new-topic').addEventListener('click', function () {
    const form = document.getElementById('new-topic-form')
    const isOpen = form.style.display === 'block'
    form.style.display = isOpen ? '' : 'block'
    if (!isOpen) {
-    document.getElementById('new-topic-input').focus()
+    newTopicInput.focus()
    }
   })
   document.getElementById('new-topic-cancel').addEventListener('click', function (e) {
