@@ -1,5 +1,4 @@
-const [fs] = 'fs'
- .split(' ').map(require)
+const [fs] = 'fs'.split(' ').map(require)
 
 module.exports = {
  async ensureDirectoryExists(directoryPath) {
@@ -7,11 +6,10 @@ module.exports = {
    fs.mkdir(directoryPath, { recursive: true }, function (error) {
     if (error) {
      reject(error)
-    }
-    else {
+    } else {
      resolve()
     }
    })
   })
- }
+ },
 }

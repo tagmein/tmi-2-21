@@ -4,10 +4,14 @@ module.exports = {
   return {
    statusCode,
    content,
-   headers: [[
-    'Content-Length', content.length,
-    'Content-Type', 'application/json; charset=utf-8'
-   ]]
+   headers: [
+    [
+     'Content-Length',
+     content.length,
+     'Content-Type',
+     'application/json; charset=utf-8',
+    ],
+   ],
   }
- }
+ },
 }

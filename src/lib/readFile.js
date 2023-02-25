@@ -1,5 +1,4 @@
-const [fs] = 'fs'
- .split(' ').map(require)
+const [fs] = 'fs'.split(' ').map(require)
 
 module.exports = {
  async readFile(filePath) {
@@ -7,11 +6,10 @@ module.exports = {
    fs.readFile(filePath, 'utf-8', function (error, contents) {
     if (error) {
      reject(error)
-    }
-    else {
+    } else {
      resolve(contents)
     }
    })
   })
- }
+ },
 }

@@ -4,11 +4,11 @@ async function profile() {
  if (key) {
   try {
    const profileResponse = await fetch('/profile.json', {
-    headers: { 'x-key': key }
+    headers: { 'x-key': key },
    })
    window.myProfile = await profileResponse.json()
    if (window.myProfile) {
-    Array.from(document.getElementsByClassName('key-input')).forEach(x => {
+    Array.from(document.getElementsByClassName('key-input')).forEach((x) => {
      x.value = key
     })
     const profileName = document.createElement('span')
@@ -28,8 +28,7 @@ async function profile() {
     })
     return
    }
-  }
-  catch (e) {
+  } catch (e) {
    console.error(e)
   }
   localStorage.removeItem('key')
@@ -53,7 +52,9 @@ async function profile() {
    </form>
   `
    document.getElementById('sign-in-email').focus()
-   document.getElementById('cancel-sign-in').addEventListener('click', resetSignIn)
+   document
+    .getElementById('cancel-sign-in')
+    .addEventListener('click', resetSignIn)
   })
  }
  resetSignIn()

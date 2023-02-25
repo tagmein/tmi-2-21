@@ -25,26 +25,12 @@ body.display {
  display: block;
 }
 
-#navbar {
- background-color: #ffffffc9;
- box-shadow: 0 0 10px #ffffffc9;
- left: 0;
- padding: 15px;
- position: fixed;
- right: 0;
- top: 0;
-}
-
-#navigation-detail>span::before {
- content: '\00bb';
- margin-right: 5px;
-}
-
 form {
  background-color: #e9e9e9;
  border-radius: 15px;
  box-shadow: 0 1px 10px #00000079;
  margin: 15px 0 30px;
+ max-width: calc(100vw - 30px);
  padding: 15px;
  width: 480px;
 }
@@ -53,10 +39,11 @@ form h3 {
  margin-bottom: 0.25em;
 }
 
-input[type="file"],
-input[type="text"],
-input[type="password"],
+input[type='file'],
+input[type='text'],
+input[type='password'],
 textarea,
+.collection,
 select {
  background-color: #ffffff;
  font-family: inherit;
@@ -67,6 +54,7 @@ select {
 input,
 button,
 textarea,
+.collection,
 select {
  border-radius: 10px;
  box-sizing: border-box;
@@ -84,24 +72,30 @@ button:hover {
  background-color: #e9e9e9;
 }
 
-input[type="submit"] {
+input[type='submit'] {
  background-color: #b9d9d9;
 }
 
-input[type="submit"]:hover {
+input[type='submit']:hover {
  background-color: #c9e9e9;
 }
 
-input[type="submit"],
+input[type='submit'],
 button {
  cursor: pointer;
  margin-right: 10px;
 }
 
-textarea {
- height: calc(100vh - 700px);
+textarea,
+.collection {
+ height: calc(100vh - 375px);
  min-height: 200px;
  resize: none;
+ margin: 0;
+}
+
+.collection {
+ margin-bottom: 17px;
 }
 
 h1 {
@@ -129,7 +123,7 @@ h4:first-child,
 h5:first-child,
 h6:first-child,
 label:first-child,
-#profile+h1 {
+#profile + h1 {
  margin-top: 0;
 }
 
@@ -142,10 +136,10 @@ a {
  color: inherit;
  cursor: pointer;
  display: inline-block;
+ line-height: 29px;
  margin: -3px 0;
  padding: 2px 0 0;
  text-decoration: none;
- line-height: inherit;
 }
 
 a:hover {
@@ -176,9 +170,9 @@ a:hover {
 
 #profile form {
  margin: 0;
- position: absolute;
- top: 0;
- right: 0;
+ position: fixed;
+ top: 15px;
+ right: 15px;
  z-index: 1;
 }
 
@@ -206,7 +200,7 @@ label {
  margin: 15px 0;
 }
 
-label>div:first-child {
+label > div:first-child {
  margin-bottom: 10px;
 }
 
@@ -227,20 +221,18 @@ label>div:first-child {
 }
 
 form.modal-form {
+ border-top-left-radius: 0;
+ border-top-right-radius: 0;
+ box-sizing: border-box;
  display: none;
  left: 50%;
- position: absolute;
- top: 100px;
+ max-height: calc(100vh - 93px);
+ overflow-x: hidden;
+ overflow-y: auto;
+ position: fixed;
+ top: 43px;
  transform: translateX(-50%);
-}
-
-form.modal-form:after {
- bottom: -99px;
- content: '';
- display: block;
- height: 1px;
- position: absolute;
- width: 1px;
+ width: 640px;
 }
 
 .post {
@@ -250,7 +242,7 @@ form.modal-form:after {
  padding: 15px;
 }
 
-.post>h3 {
+.post > h3 {
  margin-bottom: 0;
 }
 
@@ -277,4 +269,122 @@ form.modal-form:after {
  height: 600px;
  max-height: calc(100vh - 200px);
  width: 100%;
+}
+
+#navbar,
+.switch-row {
+ display: flex;
+ flex-direction: row;
+ justify-content: space-between;
+}
+
+#navbar {
+ border-bottom: 1px solid #c9c9c9;
+ left: 58px;
+ overflow-x: auto;
+ overflow-y: hidden;
+ padding: 15px;
+ position: fixed;
+ right: 0;
+ top: 0;
+ white-space: nowrap;
+ z-index: 1;
+}
+
+#navigation-detail > span::before {
+ content: '\00bb';
+ margin-right: 5px;
+}
+
+.write-switch-view-content a.write-switch-content,
+.write-switch-view-content span.write-switch-attachments,
+.write-switch-view-content .attachments {
+ display: none;
+}
+
+.write-switch-view-attachments a.write-switch-attachments,
+.write-switch-view-attachments span.write-switch-content,
+.write-switch-view-attachments .content {
+ display: none;
+}
+
+#sidebar-toggle {
+ background-color: #ffffff79;
+ border-bottom: 1px solid #c9c9c9;
+ border-right: 1px solid #c9c9c9;
+ box-sizing: border-box;
+ cursor: pointer;
+ height: 58px;
+ left: 0;
+ position: fixed;
+ top: 0;
+ width: 58px;
+ z-index: 1;
+}
+
+#sidebar,
+#content {
+ transition: left 0.5s ease;
+}
+
+#sidebar-toggle:hover {
+ background-color: #79797979;
+}
+
+#sidebar-toggle::after {
+ content: '\00ab';
+ display: block;
+ left: 23px;
+ position: absolute;
+ top: 15px;
+}
+
+#sidebar {
+ bottom: 0;
+ left: 0;
+ overflow-x: hidden;
+ overflow-y: auto;
+ position: fixed;
+ top: 57px;
+ width: 260px;
+}
+
+#sidebar a {
+ border-bottom: 1px solid #c9c9c9;
+ display: block;
+ margin: 0;
+ overflow: hidden;
+ padding: 15px;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+
+#sidebar a.active {
+ background-color: #c9e9e9;
+}
+
+#content {
+ border-left: 1px solid #c9c9c9;
+ bottom: 0;
+ left: 260px;
+ padding: 15px;
+ position: fixed;
+ right: 0;
+ top: 57px;
+}
+
+body.sidebar-hidden #sidebar {
+ left: -260px;
+}
+
+body.sidebar-hidden #content {
+ left: -1px;
+}
+
+body.sidebar-hidden #sidebar-toggle {
+ content: '\00bb';
+}
+
+body.sidebar-hidden #sidebar-toggle::after {
+ content: '\00bb';
 }

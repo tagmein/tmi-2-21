@@ -16,7 +16,7 @@ const ParsingState = {
  INIT: 0,
  READING_HEADERS: 1,
  READING_DATA: 2,
- READING_PART_SEPARATOR: 3
+ READING_PART_SEPARATOR: 3,
 }
 
 module.exports = {
@@ -110,8 +110,8 @@ module.exports = {
     }
    }
    return ''
-  }
- }
+  },
+ },
 }
 
 function process(part) {
@@ -130,7 +130,7 @@ function process(part) {
    value: b,
    writable: true,
    enumerable: true,
-   configurable: true
+   configurable: true,
   })
   return o
  }
@@ -145,7 +145,7 @@ function process(part) {
    value: contentType,
    writable: true,
    enumerable: true,
-   configurable: true
+   configurable: true,
   })
  }
  // always process the name field
@@ -153,14 +153,14 @@ function process(part) {
   value: header[1].split('=')[1].replace(/"/g, ''),
   writable: true,
   enumerable: true,
-  configurable: true
+  configurable: true,
  })
 
  Object.defineProperty(input, 'data', {
   value: Buffer.from(part.part),
   writable: true,
   enumerable: true,
-  configurable: true
+  configurable: true,
  })
  return input
 }

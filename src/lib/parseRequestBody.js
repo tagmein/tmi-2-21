@@ -19,7 +19,11 @@ module.exports = {
       bodySize += chunk.length
       if (bodySize > MAX_REQUEST_BODY_SIZE) {
        error = true
-       reject(new Error(`request body size cannot exceed ${MAX_REQUEST_BODY_SIZE} bytes`))
+       reject(
+        new Error(
+         `request body size cannot exceed ${MAX_REQUEST_BODY_SIZE} bytes`
+        )
+       )
       }
      }
     })
@@ -30,9 +34,7 @@ module.exports = {
       for (const part of parsedData) {
        if ('name' in part) {
         finalData[part.name] =
-         'filename' in part
-          ? part
-          : part.data.toString('utf-8')
+         'filename' in part ? part : part.data.toString('utf-8')
        }
       }
       resolve(finalData)
@@ -42,5 +44,5 @@ module.exports = {
     resolve({})
    }
   })
- }
+ },
 }

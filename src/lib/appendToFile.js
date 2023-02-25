@@ -1,5 +1,4 @@
-const [fs] = 'fs'
- .split(' ').map(require)
+const [fs] = 'fs'.split(' ').map(require)
 
 module.exports = {
  async appendToFile(filePath, contents) {
@@ -7,11 +6,10 @@ module.exports = {
    fs.writeFile(filePath, contents, { flag: 'a+' }, function (error) {
     if (error) {
      reject(error)
-    }
-    else {
+    } else {
      resolve()
     }
    })
   })
- }
+ },
 }

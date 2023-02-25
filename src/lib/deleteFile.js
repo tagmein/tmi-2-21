@@ -1,5 +1,4 @@
-const [fs] = 'fs'
- .split(' ').map(require)
+const [fs] = 'fs'.split(' ').map(require)
 
 module.exports = {
  async deleteFile(filePath) {
@@ -8,15 +7,13 @@ module.exports = {
     if (error) {
      if (error.code === 'ENOENT') {
       resolve()
-     }
-     else {
+     } else {
       reject(error)
      }
-    }
-    else {
+    } else {
      resolve()
     }
    })
   })
- }
+ },
 }

@@ -1,4 +1,5 @@
 async function profilePage(pageElement, navigationDetail) {
+ sidebar.visit('profile', 'Profile')
  const title = document.createElement('h3')
  title.innerText = 'My profile'
  pageElement.appendChild(title)

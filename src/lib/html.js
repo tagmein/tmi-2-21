@@ -10,9 +10,7 @@ module.exports = {
   <style>body { display: none; }</style>
  </head>
  <body tabindex="0" class="display">${content}</body>`,
-   headers: [[
-    'Content-Type', 'text/html; charset=utf-8'
-   ]]
+   headers: [['Content-Type', 'text/html; charset=utf-8']],
   }
- }
+ },
 }

@@ -1,5 +1,4 @@
-const [fs, path] = 'fs path'
- .split(' ').map(require)
+const [fs, path] = 'fs path'.split(' ').map(require)
 
 const dataRoot = path.join(__dirname, '..', '..', 'private', 'data')
 
@@ -18,12 +17,10 @@ module.exports = {
       if (error) {
        if (error.message.includes('ENOENT')) {
         resolve({})
-       }
-       else {
+       } else {
         reject(error)
        }
-      }
-      else {
+      } else {
        resolve(JSON.parse(contents))
       }
      }
@@ -32,17 +29,13 @@ module.exports = {
   },
   async remove(key) {
    return new Promise(function (resolve, reject) {
-    fs.unlink(
-     path.join(dataRoot, encodeURIComponent(key)),
-     function (error) {
-      if (error) {
-       reject(error)
-      }
-      else {
-       resolve()
-      }
+    fs.unlink(path.join(dataRoot, encodeURIComponent(key)), function (error) {
+     if (error) {
+      reject(error)
+     } else {
+      resolve()
      }
-    )
+    })
    })
   },
   async write(key, value) {
@@ -53,13 +46,12 @@ module.exports = {
      function (error) {
       if (error) {
        reject(error)
-      }
-      else {
+      } else {
        resolve()
       }
      }
     )
    })
   },
- }
+ },
 }

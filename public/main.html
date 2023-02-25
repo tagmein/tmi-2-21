@@ -1,13 +1,18 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <head>
  <meta charset="utf-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1" />
  <title>Tag Me In</title>
  <link href="/main.css" rel="stylesheet" type="text/css" />
- <link id="favicon" rel="shortcut icon" type="image/png"
-  href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX///8AAABVwtN+AAAAK0lEQVQI12P4/5/h/0eG/79B6O9thj+zGf5IM/wNZGC9z3AXjO7/R6D//wGWfRuJudGK0QAAAABJRU5ErkJggg==" />
+ <link
+  id="favicon"
+  rel="shortcut icon"
+  type="image/png"
+  href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAQMAAAAlPW0iAAAABlBMVEX///8AAABVwtN+AAAAK0lEQVQI12P4/5/h/0eG/79B6O9thj+zGf5IM/wNZGC9z3AXjO7/R6D//wGWfRuJudGK0QAAAABJRU5ErkJggg=="
+ />
  <script src="/profile.js"></script>
+ <script src="/sidebar.js"></script>
  <script src="/profile.page.js"></script>
  <script src="/invite.page.js"></script>
  <script src="/topic.page.js"></script>
@@ -15,23 +20,35 @@
 
 <body class="display main" tabindex="0">
  <div id="navbar">
+  <div>
+   <div id="sidebar-toggle"></div>
+   <a href="/#">Tag Me In</a>
+   <span id="navigation-detail"></span>
+  </div>
   <div id="profile"></div>
-  <a href="/#">Tag Me In</a>
-  <span id="navigation-detail"></span>
  </div>
+ <div id="sidebar"></div>
  <div id="content">
-  <div class="page" id="page-home" style="display: none;">
-   <h3>Topics</h3>
+  <div class="page" id="page-home" style="display: none">
+   <h3>Public topics</h3>
    <p><input id="topic-filter" type="search" placeholder="filter" /></p>
-   <form id="new-topic-form" action="/topic/create" method="post" class="modal-form registered"
-    enctype="multipart/form-data">
+   <form
+    id="new-topic-form"
+    action="/topic/create"
+    method="post"
+    class="modal-form registered"
+    enctype="multipart/form-data"
+   >
     <h3>Create new topic</h3>
     <input class="key-input" type="hidden" name="key" />
     <label>
      <div>Topic</div>
      <input id="new-topic-input" name="topic" type="text" placeholder="" />
     </label>
-    <p><input type="submit" value="Create" /> <button id="new-topic-cancel">Cancel</button></p>
+    <p>
+     <input type="submit" value="Create" />
+     <button id="new-topic-cancel">Cancel</button>
+    </p>
    </form>
    <div id="dictionary"></div>
    <p class="registered"><button id="new-topic">New topic</button></p>
@@ -50,11 +67,13 @@
     newTopicInput.focus()
    }
   })
-  document.getElementById('new-topic-cancel').addEventListener('click', function (e) {
-   e.preventDefault()
-   const form = document.getElementById('new-topic-form')
-   form.style.display = ''
-  })
+  document
+   .getElementById('new-topic-cancel')
+   .addEventListener('click', function (e) {
+    e.preventDefault()
+    const form = document.getElementById('new-topic-form')
+    form.style.display = ''
+   })
   const dictionary = document.getElementById('dictionary')
   const topicFilter = document.getElementById('topic-filter')
   const topicFilterStyle = document.createElement('style')
@@ -63,10 +82,11 @@
    if (topicFilter.value.length > 0) {
     topicFilterStyle.innerHTML = `
  #dictionary > a { display: none; }
- #dictionary > a[data-word*=${JSON.stringify(topicFilter.value)}] { display: inline-block; }
+ #dictionary > a[data-word*=${JSON.stringify(
+  topicFilter.value
+ )}] { display: inline-block; }
     `
-   }
-   else {
+   } else {
     topicFilterStyle.innerHTML = ''
    }
   }
@@ -84,6 +104,7 @@
     navigationDetail.innerHTML = ''
     if (page === '') {
      homePage.style.display = ''
+     sidebar.visit('', 'Public topics')
      return
     }
     homePage.style.display = 'none'
@@ -110,8 +131,8 @@
   async function home() {
    const topicsResponse = await fetch('/topics')
    const topics = (await topicsResponse.json())
-    .filter(x => x.type === 'directory' && !x.name.startsWith('.'))
-    .map(x => x.name)
+    .filter((x) => x.type === 'directory' && !x.name.startsWith('.'))
+    .map((x) => x.name)
     .sort()
    for (const topic of topics) {
     const topicWord = document.createElement('a')
@@ -133,5 +154,23 @@
     }
    }
   }
+
+  function setSidebar(to) {
+   if (to) {
+    document.body.classList.remove('sidebar-hidden')
+   } else {
+    document.body.classList.add('sidebar-hidden')
+   }
+  }
+
+  document
+   .getElementById('sidebar-toggle')
+   .addEventListener('click', function () {
+    const sidebarHidden = document.body.classList.contains('sidebar-hidden')
+    localStorage.setItem('sidebar', sidebarHidden)
+    setSidebar(sidebarHidden)
+   })
+
+  setSidebar(localStorage.getItem('sidebar') !== 'false')
  </script>
 </body>

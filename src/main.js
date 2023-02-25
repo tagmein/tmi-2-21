@@ -1,7 +1,6 @@
 #!/bin/env -S node
 
-const [http, fs, path, qs] = 'http fs path querystring'
- .split(' ').map(require)
+const [http, fs, path, qs] = 'http fs path querystring'.split(' ').map(require)
 
 const { appendToFile } = require('./lib/appendToFile.js')
 const { data } = require('./lib/data.js')
@@ -17,9 +16,8 @@ const { replyWithFile } = require('./lib/replyWithFile.js')
 const { saveFile } = require('./lib/saveFile.js')
 
 const portEnv = parseInt(process.env.PORT, 10)
-const port = Number.isFinite(portEnv) && portEnv >= 1 && portEnv < 65536
- ? portEnv
- : 4321
+const port =
+ Number.isFinite(portEnv) && portEnv >= 1 && portEnv < 65536 ? portEnv : 4321
 
 const rootPath = path.join(__dirname, '..', 'public')
 
@@ -29,12 +27,16 @@ function unauthorized() {
  return html('<div class="message"><span>Not authorized</span></div>', 401)
 }
 
-async function reply(requestMethod, requestPath, requestParams, requestBody, requestHeaders) {
+async function reply(
+ requestMethod,
+ requestPath,
+ requestParams,
+ requestBody,
+ requestHeaders
+) {
  const { key, ...requestBodyOther } = requestBody
  const accountKey = key ?? requestHeaders['x-key']
- const session = accountKey
-  ? await data.read(`key:${accountKey}`)
-  : undefined
+ const session = accountKey ? await data.read(`key:${accountKey}`) : undefined
  const account = session?.email
   ? await data.read(`account:${session.email}`)
   : undefined
@@ -61,26 +63,57 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
      localStorage.setItem('key', ${JSON.stringify(newKey)})
      location.replace(${JSON.stringify(requestBodyOther.redirect)})
     </script>`)
+   } else {
+    return html(
+     'Email or password is incorrect. <a onclick="history.go(-1)">Try again</a>'
+    )
    }
-   else {
-    return html('Email or password is incorrect. <a onclick="history.go(-1)">Try again</a>')
+
+  case 'POST /sidebar':
+   const home = { path: '', title: 'Public topics' }
+   const currentItem = { path: requestParams.path, title: requestParams.title }
+   const newSidebar =
+    requestParams.path === home.path ? [home] : [currentItem, home]
+   if (!account) {
+    return json(newSidebar)
    }
+   const sidebarKey = `sidebar:${account.accountId}`
+   const existingSidebar = await data.read(sidebarKey)
+   if (!Array.isArray(existingSidebar)) {
+    await data.write(sidebarKey, newSidebar)
+    return json(newSidebar)
+   }
+   if (existingSidebar.find((x) => x.path === currentItem.path)) {
+    return json(existingSidebar)
+   }
+   const updatedSidebar = [currentItem, ...existingSidebar]
+   await data.write(sidebarKey, updatedSidebar)
+   return json(updatedSidebar)
 
   case 'POST /profile/create':
    if (!account) {
     return unauthorized()
-   } {
+   }
+   {
     const email = requestBodyOther.email.trim()
     if (email.length > 100) {
-     return html('That email address is too long, use 100 characters or less. <a onclick="history.go(-1)">Try again</a>')
+     return html(
+      'That email address is too long, use 100 characters or less. <a onclick="history.go(-1)">Try again</a>'
+     )
     }
     const existingProfile = await data.read(`account:${email}`)
     if (existingProfile?.password) {
-     return html('That email address is already registered as a Tag Me In account. <a onclick="history.go(-1)">Try again</a>')
+     return html(
+      'That email address is already registered as a Tag Me In account. <a onclick="history.go(-1)">Try again</a>'
+     )
     }
     const password = randomCode(20)
     await data.write(`account:${email}`, { password })
-    return html(`Created account for ${JSON.stringify(email)} with password ${password} - be sure to share the password with the new user. <a href="/">Home</a>`)
+    return html(
+     `Created account for ${JSON.stringify(
+      email
+     )} with password ${password} - be sure to share the password with the new user. <a href="/">Home</a>`
+    )
    }
 
   case 'POST /profile/update':
@@ -89,7 +122,9 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    }
    const displayName = requestBodyOther.displayName.trim()
    if (displayName.length > 100) {
-    return html('That name is too long, use 100 characters or less. <a onclick="history.go(-1)">Try again</a>')
+    return html(
+     'That name is too long, use 100 characters or less. <a onclick="history.go(-1)">Try again</a>'
+    )
    }
    await data.write(`account:${session.email}`, { ...account, displayName })
    return redirect('/#profile')
@@ -108,10 +143,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
    return redirect('/')
 
   case 'POST /topic/post/delete':
-   if (
-    !account ||
-    !(requestParams.id?.startsWith?.(account.accountId))
-   ) {
+   if (!account || !requestParams.id?.startsWith?.(account.accountId)) {
     return unauthorized()
    }
    {
@@ -131,7 +163,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
     await saveFile(
      epochFilePath,
      existingEpochFile.substring(0, postStartIndex) +
-     existingEpochFile.substring(postEndIndex + postEnd.length)
+      existingEpochFile.substring(postEndIndex + postEnd.length)
     )
     return { statusCode: 201 }
    }
@@ -145,11 +177,7 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
     const { topic, title, content } = requestBodyOther
     if (title?.trim()?.length > 0 || content?.trim()?.length > 0) {
      await ensureDirectoryExists(
-      path.join(
-       rootPath,
-       'topics',
-       encodeURIComponent(topic)
-      )
+      path.join(rootPath, 'topics', encodeURIComponent(topic))
      )
      const timestamp = Date.now()
      const epoch = Math.floor(timestamp / 1e8)
@@ -171,12 +199,13 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
         timestamp,
         title,
        },
-       id
+       id,
       ]) + ',\n'
      )
-    }
-    else {
-     return html(`Must write something: <a onclick="history.go(-1)">Try again</a>`)
+    } else {
+     return html(
+      `Must write something: <a onclick="history.go(-1)">Try again</a>`
+     )
     }
    }
    return redirect(`/#topic/${encodeURIComponent(requestBodyOther.topic)}`)
@@ -186,12 +215,14 @@ async function reply(requestMethod, requestPath, requestParams, requestBody, req
 
   default:
    if (requestMethod !== 'GET') {
-    return html('<div class="message"><span>Method not allowed</span></div>', 400)
+    return html(
+     '<div class="message"><span>Method not allowed</span></div>',
+     400
+    )
    }
    try {
     return replyWithFile(path.join(rootPath, requestPath))
-   }
-   catch (e) {
+   } catch (e) {
     if (e.code === 'ENOENT') {
      return html('<div class="message"><span>Not found</span></div>', 404)
     }
@@ -213,7 +244,7 @@ async function main() {
     statusCode = 200,
     contentType = 'text/plain; charset=utf-8',
     content = '',
-    headers = []
+    headers = [],
    } = (await reply(
     requestMethod,
     requestPath.replace(/\/$/, ''), // important to prevent listing /home/
@@ -221,9 +252,9 @@ async function main() {
     requestBody,
     request.headers
    )) ?? {
-     statusCode: 500,
-     content: 'Server error'
-    }
+    statusCode: 500,
+    content: 'Server error',
+   }
    response.statusCode = statusCode
    response.setHeader('Content-Type', contentType)
    for (const [k, v] of headers) {
@@ -231,8 +262,7 @@ async function main() {
    }
    response.write(content)
    response.end()
-  }
-  catch (e) {
+  } catch (e) {
    console.error(e)
    response.statusCode = e.statusCode ?? 500
    response.setHeader('Content-Type', 'text/plain; charset=utf-8')

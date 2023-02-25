@@ -1,6 +1,6 @@
-const sandbox = [
- 'downloads', 'forms', 'scripts'
-].map(x => `allow-${x}`).join(' ')
+const sandbox = ['downloads', 'forms', 'scripts']
+ .map((x) => `allow-${x}`)
+ .join(' ')
 
 function attachFrameWithContent(attachTo, content) {
  const newFrame = document.createElement('iframe')
@@ -12,6 +12,7 @@ function attachFrameWithContent(attachTo, content) {
 }
 
 async function topicPage(pageElement, navigationDetail, topic) {
+ sidebar.visit(`topic/${encodeURIComponent(topic)}`, topic)
  const topicCrumb = document.createElement('span')
  topicCrumb.innerText = topic
  navigationDetail.appendChild(topicCrumb)
@@ -19,7 +20,13 @@ async function topicPage(pageElement, navigationDetail, topic) {
  title.innerText = topic
  pageElement.appendChild(title)
  const writeModal = document.createElement('div')
- writeModal.innerHTML = `<form id="write-form" action="/topic/write" method="post" class="modal-form registered" enctype="multipart/form-data">
+ writeModal.innerHTML = `<form
+ action="/topic/write"
+ class="modal-form registered write-switch-view-content"
+ enctype="multipart/form-data"
+ id="write-form"
+ method="post"
+>
  <h3>Write</h3>
  <input id="write-topic" type="hidden" name="topic" />
  <input id="write-key" type="hidden" name="key" />
@@ -28,8 +35,18 @@ async function topicPage(pageElement, navigationDetail, topic) {
   <input id="write-title" name="title" type="text" placeholder="" />
  </label>
  <label>
-  <div>Content</div>
-  <textarea name="content" placeholder=""></textarea>
+  <div class="switch-row">
+   <a id="write-switch-content" class="write-switch-content">
+    Content
+   </a>
+   <span class="write-switch-attachments">Attachments (<span id="write-attachment-count-1">0</span>)</span>
+   <span class="write-switch-content">Content</span>
+   <a class="write-switch-attachments" id="write-switch-attachments">
+    Attachments (<span id="write-attachment-count-2">0</span>)
+   </a>
+  </div>
+  <textarea name="content" class="content" placeholder=""></textarea>
+  <div class="attachments collection" tabindex="1"></div>
  </label>
  <p>
   <input type="submit" value="Post" />
@@ -50,15 +67,37 @@ async function topicPage(pageElement, navigationDetail, topic) {
    document.getElementById('write-title').focus()
   }
  })
- document.getElementById('write-cancel').addEventListener('click', function (event) {
-  event.preventDefault()
-  writeForm.style.display = ''
- })
+ document
+  .getElementById('write-cancel')
+  .addEventListener('click', function (event) {
+   event.preventDefault()
+   writeForm.style.display = ''
+  })
  document.getElementById('write-key').value = localStorage.getItem('key')
  document.getElementById('write-topic').value = topic
  pageElement.appendChild(writeModal)
  pageElement.appendChild(topicToolbar)
 
+ // writeForm
+ const [
+  switchToContent,
+  switchToAttachments,
+  attachmentCount1,
+  attachmentCount2,
+ ] = [
+  'write-switch-content',
+  'write-switch-attachments',
+  'write-attachment-count-1',
+  'write-attachment-count-2',
+ ].map((x) => document.getElementById(x))
+ switchToContent.addEventListener('click', function () {
+  writeForm.classList.remove('write-switch-view-attachments')
+  writeForm.classList.add('write-switch-view-content')
+ })
+ switchToAttachments.addEventListener('click', function () {
+  writeForm.classList.remove('write-switch-view-content')
+  writeForm.classList.add('write-switch-view-attachments')
+ })
  let totalPostCount = 0
  const maxPosts = 100
 
@@ -71,22 +110,28 @@ async function topicPage(pageElement, navigationDetail, topic) {
   postElement.appendChild(postTitle)
   const postAuthor = document.createElement('p')
   postAuthor.classList.add('author')
-  postAuthor.innerText = post.displayName + ' '
-   + new Date(post.timestamp)
-    .toLocaleString().replace(/:\d\d/, '')
+  postAuthor.innerText =
+   post.displayName +
+   ' ' +
+   new Date(post.timestamp).toLocaleString().replace(/:\d\d/, '')
   if (window.myProfile && post.accountId === window.myProfile.accountId) {
    const deleteLink = document.createElement('a')
    deleteLink.innerText = 'Delete'
    deleteLink.addEventListener('click', async function () {
-    const shouldContinue = confirm(`Are you sure you want to delete the post ${JSON.stringify(post.title)}`)
+    const shouldContinue = confirm(
+     `Are you sure you want to delete the post ${JSON.stringify(post.title)}`
+    )
     if (shouldContinue) {
-     await fetch(`/topic/post/delete?topic=${encodeURIComponent(topic)}` +
-      `&epoch=${epoch}&id=${post.id}`, {
-      method: 'POST',
-      headers: {
-       'x-key': localStorage.getItem('key')
+     await fetch(
+      `/topic/post/delete?topic=${encodeURIComponent(topic)}` +
+       `&epoch=${epoch}&id=${post.id}`,
+      {
+       method: 'POST',
+       headers: {
+        'x-key': localStorage.getItem('key'),
+       },
       }
-     })
+     )
      postElement.parentElement.removeChild(postElement)
     }
    })
@@ -96,8 +141,7 @@ async function topicPage(pageElement, navigationDetail, topic) {
   let isFirst = true
   if (post.content.startsWith('<!doctype html>')) {
    attachFrameWithContent(postElement, post.content)
-  }
-  else {
+  } else {
    for (const paragraph of post.content.trim().split('\n')) {
     if (isFirst) {
      isFirst = false
@@ -114,12 +158,13 @@ async function topicPage(pageElement, navigationDetail, topic) {
  }
 
  const allEpochsResponse = await fetch(`/topics/${encodeURIComponent(topic)}`)
- const allEpochs = (await allEpochsResponse.json())
-  .map(x => x.name).sort()
+ const allEpochs = (await allEpochsResponse.json()).map((x) => x.name).sort()
 
  async function loadPostsForEpoch(epoch) {
   try {
-   const epochResponse = await fetch(`/topics/${encodeURIComponent(topic)}/${epoch}`)
+   const epochResponse = await fetch(
+    `/topics/${encodeURIComponent(topic)}/${epoch}`
+   )
    if (epochResponse.ok) {
     const epochText = await epochResponse.text()
     const epochPosts = JSON.parse(`[${epochText}{}]`)
@@ -129,8 +174,7 @@ async function topicPage(pageElement, navigationDetail, topic) {
      renderPost(epoch, post)
     }
    }
-  }
-  catch (e) {
+  } catch (e) {
    console.log(e)
   }
   if (totalPostCount < maxPosts && allEpochs.length > 0) {
